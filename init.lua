@@ -203,6 +203,9 @@ vim.keymap.set('n', '<leader>wl', '<C-w><C-l>', { desc = 'Move focus to the righ
 vim.keymap.set('n', '<leader>wj', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<leader>wk', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<leader>vp', '<C-w>v<C-^>', { desc = '[V]ertical split with [P]revious window' })
+vim.keymap.set('n', '<leader>sp', '<C-w>s<C-^>', { desc = '[S]unset split with [P]revious window' })
+
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
@@ -215,6 +218,18 @@ vim.keymap.set('n', '<leader>cp', '<cmd>cprev<CR>', { noremap = true, silent = t
 vim.keymap.set('n', '<leader>cn', '<cmd>cnext<CR>', { noremap = true, silent = true })
 -- quick fix list
 vim.keymap.set('n', '<leader>co', '<cmd>copen<CR>', { noremap = true, silent = true })
+
+vim.keymap.set({ 'n', 'v' }, '<leader>tc', function()
+  local folder = '~/org/cap/'
+  if vim.fn.isdirectory(vim.fn.expand(folder)) == 1 then
+    vim.cmd 'belowright 10 split'
+    local time = vim.fn.strftime '%Y/%b/%d'
+    vim.cmd('edit ' .. folder .. time .. '.org')
+    vim.cmd 'silent !mkdir -p %:h'
+  else
+    print 'clone or stow your org files first man'
+  end
+end)
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -457,17 +472,11 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>ht', builtin.help_tags, { desc = '[H]elp [T]ags' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
+      vim.keymap.set('n', '<leader>fz', builtin.current_buffer_fuzzy_find, { desc = '[/] Fuzzily search in current buffer' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>lb', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
@@ -475,9 +484,9 @@ require('lazy').setup({
       end, { desc = '[S]earch [/] in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
+      vim.keymap.set('n', '<leader>rc', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
+      end, { desc = 'vim[RC]' })
     end,
   },
 
@@ -1009,6 +1018,35 @@ require('lazy').setup({
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
   -- you can continue same window with `<space>sr` which resumes last telescope search
+  {
+    'Josiah-tan/quick-projects-nvim',
+    event = 'VimEnter',
+    config = function()
+      require('quick_projects').setup {
+        debug_mode_on = true,
+      }
+      local builtins = require 'quick_projects.builtins'
+      vim.keymap.set('n', '<leader>qp', builtins.quickProjects, { desc = '[Q]uick [P]rojects' })
+    end,
+  },
+  {
+    'ThePrimeagen/harpoon',
+    config = function()
+      local term = require 'harpoon.term'
+      vim.keymap.set('n', '<leader>tj', function()
+        term.gotoTerminal(1)
+      end, { desc = '[H]arpoon [j]' })
+      vim.keymap.set('n', '<leader>tk', function()
+        term.gotoTerminal(2)
+      end, { desc = '[H]arpoon [j]' })
+      vim.keymap.set('n', '<leader>tl', function()
+        term.gotoTerminal(3)
+      end, { desc = '[H]arpoon [j]' })
+      vim.keymap.set('n', '<leader>t;', function()
+        term.gotoTerminal(4)
+      end, { desc = '[H]arpoon [j]' })
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
