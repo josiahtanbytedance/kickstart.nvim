@@ -167,7 +167,10 @@ vim.o.scrolloff = 10
 vim.o.confirm = true
 
 -- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
+-- plover related keymaps
+vim.keymap.set('i', '<C-j>', '<C-\\><C-o>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-j>', '<nop>', { noremap = true, silent = true })
+vim.keymap.set('t', '<C-j>', '<C-\\><C-n>', { noremap = true, silent = true })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -242,6 +245,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  pattern = '*.py',
+  callback = function()
+    -- Set register p
+    vim.fn.setreg('p', [[:s/\([^=]*\)=.*/&\r\1/ge|s/\(\s*\).\{-}\([^ ]\+\) \{-}$/\1print(f"\2 = {\2}")/j]])
   end,
 })
 
@@ -481,12 +492,37 @@ require('lazy').setup({
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
         }
-      end, { desc = '[S]earch [/] in Open Files' })
+      end, { desc = '[L]ive Grep [B]uffers' })
+
+      vim.keymap.set('n', '<leader>lh', function()
+        builtin.live_grep {
+          cwd = vim.fn.expand '~',
+          glob_pattern = '.zsh_history',
+        }
+      end, { desc = '[L]ive Grep [H]istory' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>rc', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = 'vim[RC]' })
+
+      vim.keymap.set('n', '<leader>lrc', function()
+        builtin.live_grep {
+          cwd = vim.fn.stdpath 'config',
+          prompt_title = 'Live Grep Vimrc',
+        }
+      end, { desc = '[L]ive Grep vim[RC]' })
+
+      vim.keymap.set('n', '<leader>fo', function()
+        builtin.find_files { cwd = '~/org/' }
+      end, { desc = '[F]ind [O]rg' })
+
+      vim.keymap.set('n', '<leader>lo', function()
+        builtin.live_grep {
+          cwd = '~/org/',
+          prompt_title = 'Live Grep Org',
+        }
+      end, { desc = '[L]ive grep [O]rg' })
     end,
   },
 
