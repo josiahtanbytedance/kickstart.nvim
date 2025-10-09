@@ -450,9 +450,32 @@ require('lazy').setup({
             height = 0.99,
             -- other layout configuration here
           },
-          --   mappings = {
-          --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-          --   },
+          mappings = {
+            i = {
+              ['<C-o>'] = function(prompt_bufnr)
+                local actions = require 'telescope.actions'
+                local action_state = require 'telescope.actions.state'
+
+                local entry = action_state.get_selected_entry()
+                actions.close(prompt_bufnr)
+
+                -- Build full path safely
+                local path = vim.fn.fnamemodify(entry.path or (entry.cwd .. '/' .. entry.value), ':p')
+
+                -- Open file depending on OS
+                local cmd
+                if vim.fn.has 'win32' ~= 0 then
+                  cmd = string.format('start "" "%s"', path)
+                elseif vim.fn.has 'macunix' ~= 0 then
+                  cmd = string.format('open "%s"', path)
+                else
+                  cmd = string.format('xdg-open "%s" &', path)
+                end
+
+                vim.fn.system(cmd)
+              end,
+            },
+          },
         },
         -- pickers = {}
         extensions = {
