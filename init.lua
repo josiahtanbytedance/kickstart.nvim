@@ -299,6 +299,24 @@ require('lazy').setup({
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
   {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'sindrets/diffview.nvim',
+      'nvim-telescope/telescope.nvim',
+    },
+    keys = {
+      {
+        '<leader>gs',
+        function()
+          require('neogit').open { kind = 'replace' }
+        end,
+        desc = 'Open Neogit',
+      },
+    },
+    config = true, -- uses default setup
+  },
+  {
     'lewis6991/gitsigns.nvim',
     config = function()
       require('gitsigns').setup {
