@@ -331,7 +331,11 @@ require('lazy').setup({
               gitsigns.nav_hunk 'prev'
             end
           end)
-          map('n', '<leader>hp', gitsigns.preview_hunk)
+          map('n', '<leader>ghp', gitsigns.preview_hunk)
+          map('n', '<leader>ght', gitsigns.toggle_current_line_blame)
+          map('n', '<leader>ghb', function()
+            gitsigns.blame_line { full = true }
+          end)
         end,
       }
     end,
@@ -1144,7 +1148,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
